@@ -1,6 +1,7 @@
 package br.com.igormartinez.cambioservice.cambio;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -9,18 +10,23 @@ import org.springframework.stereotype.Service;
 public class CambioService {
 
     private final Environment environment;
-    
-    public CambioService(Environment environment) {
+    private final CambioRepository repository;
+
+    public CambioService(Environment environment, CambioRepository repository) {
         this.environment = environment;
+        this.repository = repository;
     }
 
     public CambioResponse getCambio(BigDecimal amount, String from, String to) {
+
+        Cambio cambio = repository.findByFromAndTo(from, to)
+            .orElseThrow(() -> new RuntimeException("Currency unsupported"));
+
         return new CambioResponse(
-            1L, 
-            from, 
-            to, 
-            BigDecimal.ONE, 
-            amount, 
+            cambio.getFrom(), 
+            cambio.getTo(), 
+            cambio.getConversionFactor(), 
+            cambio.getConversionFactor().multiply(amount).setScale(2, RoundingMode.CEILING), 
             environment.getProperty("local.server.port"));
     }
 }
