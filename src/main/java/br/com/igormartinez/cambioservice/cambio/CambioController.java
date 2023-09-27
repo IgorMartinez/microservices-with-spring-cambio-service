@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Cambio Service API")
 @RestController
 @RequestMapping("/cambio")
 public class CambioController {
@@ -15,6 +19,7 @@ public class CambioController {
     @Autowired
     private CambioService service;
     
+    @Operation(description = "Get cambio from currency")
     @GetMapping(value = "/{amount}/{from}/{to}")
     public CambioResponse getCambio(
         @PathVariable("amount") BigDecimal amount,
